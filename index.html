@@ -349,6 +349,19 @@
             border: 1px dashed rgba(255, 255, 255, 0.15);
         }
 
+        /* Animation classes for interactive simulator */
+        @keyframes rollShake {
+            0% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-15deg) scale(1.1); }
+            40% { transform: rotate(15deg) scale(1.1); }
+            60% { transform: rotate(-10deg) scale(1.05); }
+            80% { transform: rotate(10deg) scale(1.05); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+        .anim-shake {
+            animation: rollShake 0.4s ease-in-out;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 1024px) {
             .sidebar { transform: translateX(-100%); }
@@ -754,7 +767,7 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
                             <!-- SIMULATOR DADU -->
                             <div class="interactive-sim-box">
-                                <i class="fa-solid fa-dice-d6" style="font-size: 3rem; color: var(--secondary-amber); margin-bottom: 12px;"></i>
+                                <i id="dice-icon" class="fa-solid fa-dice-d6" style="font-size: 3rem; color: var(--secondary-amber); margin-bottom: 12px; display: inline-block;"></i>
                                 <h3>Simulasi Lempar 2 Dadu</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0 16px 0;">Hitung frekuensi kemunculan jumlah mata dadu!</p>
                                 
@@ -762,24 +775,32 @@
                                     🎲 [ ? ] + [ ? ] = ?
                                 </div>
 
-                                <button class="btn btn-amber" style="width: 100%;" onclick="app.rollDice()">
+                                <button id="btn-roll-dice" class="btn btn-amber" style="width: 100%;" onclick="app.rollDice()">
                                     LEMPAR DADU SEKARANG <i class="fa-solid fa-rotate"></i>
                                 </button>
+                                
+                                <div style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);" id="dice-stats">
+                                    Total Lemparan: <b style="color:#fff;" id="dice-count">0</b> kali
+                                </div>
                             </div>
 
                             <!-- SIMULATOR KOIN -->
                             <div class="interactive-sim-box">
-                                <i class="fa-solid fa-coins" style="font-size: 3rem; color: var(--primary-emerald); margin-bottom: 12px;"></i>
+                                <i id="coin-icon" class="fa-solid fa-coins" style="font-size: 3rem; color: var(--primary-emerald); margin-bottom: 12px; display: inline-block;"></i>
                                 <h3>Simulasi Lempar 3 Koin</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 8px 0 16px 0;">Kemungkinan Angka (A) dan Gambar (G)</p>
                                 
-                                <div style="font-size: 1.8rem; font-weight: 800; color: var(--secondary-amber); margin-bottom: 16px;" id="coin-result">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--secondary-amber); margin-bottom: 16px;" id="coin-result">
                                     🪙 [ ? ] [ ? ] [ ? ]
                                 </div>
 
-                                <button class="btn btn-emerald" style="width: 100%;" onclick="app.flipCoins()">
+                                <button id="btn-flip-coin" class="btn btn-emerald" style="width: 100%;" onclick="app.flipCoins()">
                                     LEMPAR KOIN SEKARANG <i class="fa-solid fa-rotate"></i>
                                 </button>
+                                
+                                <div style="margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);" id="coin-stats">
+                                    Total Lemparan: <b style="color:#fff;" id="coin-count">0</b> kali
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1048,20 +1069,66 @@
             },
 
             // REAL-TIME SIMULATORS
+            diceTotalRolls: 0,
+            coinTotalRolls: 0,
+
             rollDice() {
-                const d1 = Math.floor(Math.random() * 6) + 1;
-                const d2 = Math.floor(Math.random() * 6) + 1;
-                document.getElementById('dice-result').innerText = `🎲 [ ${d1} ] + [ ${d2} ] = ${d1 + d2}`;
-                this.addXP(5);
+                const btn = document.getElementById('btn-roll-dice');
+                const icon = document.getElementById('dice-icon');
+                const resultBox = document.getElementById('dice-result');
+                
+                // Add animation class
+                icon.classList.remove('anim-shake');
+                void icon.offsetWidth; // trigger reflow
+                icon.classList.add('anim-shake');
+                
+                btn.disabled = true;
+                resultBox.style.opacity = '0.5';
+
+                setTimeout(() => {
+                    const d1 = Math.floor(Math.random() * 6) + 1;
+                    const d2 = Math.floor(Math.random() * 6) + 1;
+                    const total = d1 + d2;
+                    
+                    resultBox.innerText = `🎲 [ ${d1} ] + [ ${d2} ] = ${total}`;
+                    resultBox.style.opacity = '1';
+                    
+                    this.diceTotalRolls++;
+                    document.getElementById('dice-count').innerText = this.diceTotalRolls;
+                    
+                    btn.disabled = false;
+                    this.addXP(5);
+                }, 250);
             },
 
             flipCoins() {
-                const sides = ['Angka (A)', 'Gambar (G)'];
-                const c1 = sides[Math.floor(Math.random() * 2)];
-                const c2 = sides[Math.floor(Math.random() * 2)];
-                const c3 = sides[Math.floor(Math.random() * 2)];
-                document.getElementById('coin-result').innerText = `🪙 [ ${c1} ] [ ${c2} ] [ ${c3} ]`;
-                this.addXP(5);
+                const btn = document.getElementById('btn-flip-coin');
+                const icon = document.getElementById('coin-icon');
+                const resultBox = document.getElementById('coin-result');
+                
+                // Add animation class
+                icon.classList.remove('anim-shake');
+                void icon.offsetWidth; // trigger reflow
+                icon.classList.add('anim-shake');
+                
+                btn.disabled = true;
+                resultBox.style.opacity = '0.5';
+
+                setTimeout(() => {
+                    const sides = ['A', 'G'];
+                    const c1 = sides[Math.floor(Math.random() * 2)];
+                    const c2 = sides[Math.floor(Math.random() * 2)];
+                    const c3 = sides[Math.floor(Math.random() * 2)];
+                    
+                    resultBox.innerText = `🪙 [ ${c1} ] [ ${c2} ] [ ${c3} ]`;
+                    resultBox.style.opacity = '1';
+                    
+                    this.coinTotalRolls++;
+                    document.getElementById('coin-count').innerText = this.coinTotalRolls;
+                    
+                    btn.disabled = false;
+                    this.addXP(5);
+                }, 250);
             },
 
             initBossChallenge() {
