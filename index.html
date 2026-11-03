@@ -709,8 +709,8 @@
                             <h4><i class="fa-solid fa-trophy"></i> Studi Kasus Turnamen Mobile Legends:</h4>
                             <p style="font-size: 0.9rem; margin-top: 6px; line-height: 1.5;">
                                 Dari <b>8 pemain pro</b> yang tersedia:
-                                <br>1. Berapa banyak cara memilih <b>5 pemain inti</b> (posisi acak)? $\implies \text{Gunakan Kombinasi } 8 C 5$.
-                                <br>2. Berapa banyak cara memilih <b>Juara 1, Juara 2, dan Juara 3</b>? $\implies \text{Gunakan Permutasi } 8 P 3$.
+                                <br>1. Berapa banyak cara memilih <b>5 pemain inti</b> (posisi acak)? $\implies \text{Gunakan Kombinasi } {}_8 C_5$.
+                                <br>2. Berapa banyak cara memilih <b>Juara 1, Juara 2, dan Juara 3</b>? $\implies \text{Gunakan Permutasi } {}_8 P_3$.
                             </p>
                         </div>
 
@@ -992,18 +992,24 @@
                 box.style.display = 'block';
                 box.innerHTML = `
                     <div style="padding: 20px; line-height: 1.8;">
-                        <h4 style="color: var(--secondary-amber);">Hasil Perhitungan Kasus e-Sports:</h4>
-                        <p style="font-size: 0.9rem; margin-top: 8px;">
-                            1. Banyak cara memilih <b>5 pemain inti</b> dari 8 ($8 C 5$):<br>
-                            $$\binom{8}{5} = \frac{8 \times 7 \times 6}{3 \times 2 \times 1} = \mathbf{56 \text{ cara}}$$
-                            <br>
-                            2. Banyak cara menentukan <b>Juara 1, 2, 3</b> dari 8 tim ($8 P 3$):<br>
-                            $$8 P 3 = 8 \times 7 \times 6 = \mathbf{336 \text{ susunan}}$$
-                        </p>
+                        <h4 style="color: var(--secondary-amber); margin-bottom: 12px;">Hasil Perhitungan Kasus e-Sports:</h4>
+                        <div style="font-size: 0.95rem;">
+                            <p><b>1. Banyak cara memilih 5 pemain inti dari 8 (${'\\({}_8 C_5\\)'}):</b></p>
+                            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 8px 0 16px 0; text-align: center;">
+                                $$\\binom{8}{5} = \\frac{8 \\times 7 \\times 6}{3 \\times 2 \\times 1} = \\mathbf{56 \\text{ cara}}$$
+                            </div>
+                            
+                            <p><b>2. Banyak cara menentukan Juara 1, 2, 3 dari 8 tim (${'\\({}_8 P_3\\)'}):</b></p>
+                            <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin: 8px 0 16px 0; text-align: center;">
+                                $${'{}_8 P_3'} = 8 \\times 7 \\times 6 = \\mathbf{336 \\text{ susunan}}$$
+                            </div>
+                        </div>
                     </div>
                 `;
                 this.completeMisi(2);
-                if (window.MathJax) MathJax.typesetPromise();
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise([box]).catch((err) => console.log(err));
+                }
             },
 
             // FACTORIAL HELPER
